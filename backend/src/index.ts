@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import User from "./model/User";
 import { Encrypt } from "./utils/bcryptEncription";
 import asyncHandler from "./utils/catchAsync";
+import router from "./routes/users";
 
 dotenv.config();
 
@@ -40,6 +41,9 @@ io.on("connection", (socket) => {
     console.log("user disconnected");
   });
 });
+
+app.use("/user", router);
+
 
 app.get(
   "/",

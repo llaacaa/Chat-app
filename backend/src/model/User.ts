@@ -6,6 +6,7 @@ export interface IUser extends Document {
   password: string;
   friends: mongoose.Types.ObjectId[];
   createdAt: Date;
+  lastOnline: Date;
 }
 
 const userSchema: Schema = new Schema({
@@ -33,6 +34,10 @@ const userSchema: Schema = new Schema({
     },
   ],
   createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  lastOnline: {
     type: Date,
     default: Date.now,
   },
