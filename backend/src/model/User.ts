@@ -7,6 +7,7 @@ export interface IUser extends Document {
   friends: mongoose.Types.ObjectId[];
   createdAt: Date;
   lastOnline: Date;
+  verified: boolean;
 }
 
 const userSchema: Schema = new Schema({
@@ -31,6 +32,7 @@ const userSchema: Schema = new Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User', 
+      default: [],
     },
   ],
   createdAt: {
@@ -41,6 +43,10 @@ const userSchema: Schema = new Schema({
     type: Date,
     default: Date.now,
   },
+  verified: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 const User = mongoose.model<IUser>('User', userSchema);

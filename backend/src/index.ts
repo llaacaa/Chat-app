@@ -1,14 +1,10 @@
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import dotenv from "dotenv";
-import mongoose from "mongoose";
-import User from "./model/User";
-import { Encrypt } from "./utils/bcryptEncription";
-import asyncHandler from "./utils/catchAsync";
 import router from "./routes/users";
+import mongoConnect from "./utils/mongoConnect";
 
-dotenv.config();
 
 const app = express();
 const server = createServer(app);
@@ -20,14 +16,25 @@ const io = new Server(server, {
   },
 });
 
-mongoose
-  .connect(process.env.MONGODB_URL || "")
-  .then(() => {
-    console.log("Connected to MongoDB successfully");
-  })
-  .catch((err) => {
-    console.error("Error connecting to MongoDB:", err);
-  });
+dotenv.config();
+mongoConnect();
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', `${process.env.NEXT_SERVER_URL}`); 
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');  
+  next();
+});
+
+
+
+// To handle JSON data
+app.use(express.json());
+
+// To handle x-www-form-urlencoded data
+app.use(express.urlencoded({ extended: true }));
+
 
 io.on("connection", (socket) => {
   console.log("a user connected");
@@ -42,28 +49,7 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use("/user", router);
-
-
-app.get(
-  "/",
-  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const password = "lacanajjaci123";
-    const newPassword = await Encrypt.cryptPassword(password);
-    const user = new User({
-      username: "Laca",
-      email: "lazarkojic@gmail.com",
-      password: newPassword,
-      friends: [],
-    });
-
-    await user.save();
-
-    res.send("<h1>Good</h1>");
-    next();
-  })
-);
-
+app.use("/users", router);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
