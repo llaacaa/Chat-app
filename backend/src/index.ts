@@ -2,9 +2,10 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import dotenv from "dotenv";
+import cors from "cors";
 import router from "./routes/users";
 import mongoConnect from "./utils/mongoConnect";
-
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const server = createServer(app);
@@ -19,22 +20,23 @@ const io = new Server(server, {
 dotenv.config();
 mongoConnect();
 
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', `${process.env.NEXT_SERVER_URL}`); 
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');  
-  next();
-});
+//Cors
+const corsOptions = {
+  origin: process.env.NEXT_SERVER_URL,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true, 
+};
 
 
-
+app.use(cors(corsOptions));
 // To handle JSON data
 app.use(express.json());
 
 // To handle x-www-form-urlencoded data
 app.use(express.urlencoded({ extended: true }));
 
+app.use(cookieParser());
 
 io.on("connection", (socket) => {
   console.log("a user connected");
@@ -49,7 +51,7 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use("/users", router);
+app.use("/user", router);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

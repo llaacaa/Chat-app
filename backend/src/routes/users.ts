@@ -1,6 +1,6 @@
 import express from "express";
 import asyncHandler from "../utils/catchAsync";
-import { registerUser, loginUser, logoutUser } from "../controller/user";
+import { registerUser, loginUser, logoutUser, getUserProfile } from "../controller/user";
 import { checkForToken } from "../utils/jsonWebToken"; 
 
 const router = express.Router();
@@ -13,5 +13,6 @@ router.post("/login", asyncHandler(loginUser));
 
 router.post("/logout", asyncHandler(logoutUser))
 
+router.post("/getProfile", asyncHandler(getUserProfile));
 
 export default router;
