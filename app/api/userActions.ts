@@ -20,7 +20,13 @@ export const registerUser = async (data: object, router: AppRouterInstance) => {
       router.push("/");
     }
   } catch (error: unknown) {
-    alert(error.response.data.message);
+    if (axios.isAxiosError(error) && error.response) {
+      console.log(error.response.data.message);
+      return error.response;
+    } else {
+      console.log("An unknown error occurred:", error);
+      return error;
+    }
   }
 };
 
@@ -41,9 +47,44 @@ export const loginUser = async (data: object, router: AppRouterInstance) => {
       router.push("/");
     }
   } catch (error: unknown) {
-    alert(error.response.data.message);
+    if (axios.isAxiosError(error) && error.response) {
+      console.log(error.response.data.message);
+      return error.response;
+    } else {
+      console.log("An unknown error occurred:", error);
+      return error;
+    }
   }
 };
+
+export const logoutUser = async (router: AppRouterInstance) => {
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_USER_AUTH_ROUTE}/logout`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    console.log("🚀 ~ registerUser ~ response:", response);
+    if (response.status == 201) {
+      router.push("/");
+    }
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response) {
+      console.log(error.response.data.message);
+      return error.response;
+    } else {
+      console.log("An unknown error occurred:", error);
+      return error;
+    }
+  }
+};
+
+
 
 
 //Test
