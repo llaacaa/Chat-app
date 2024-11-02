@@ -1,12 +1,18 @@
 import express from "express";
 import asyncHandler from "../utils/catchAsync";
+import { registerUser, loginUser, logoutUser, getUserProfile } from "../controller/user";
+import { checkForToken } from "../utils/jsonWebToken"; 
 
 const router = express.Router();
 
-router.post("/register", )
+router.get("/test-check", asyncHandler(checkForToken));
 
-router.post("/login", )
+router.post("/register", asyncHandler(registerUser));
 
-router.post("/logout", )
+router.post("/login", asyncHandler(loginUser));
 
-//dev branch
+router.post("/logout", asyncHandler(logoutUser))
+
+router.post("/getProfile", asyncHandler(getUserProfile));
+
+export default router;

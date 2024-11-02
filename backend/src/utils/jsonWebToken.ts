@@ -1,0 +1,33 @@
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { NextFunction, Request, Response } from "express";
+const secretKey = process.env.JWT_SECRET || "your-secret-key";
+
+const jsonWebToken = {
+  generateToken: (userId: string): string => {
+    return jwt.sign({ userId }, secretKey, { expiresIn: "1h" });
+  },
+  verifyToken: (token: string): JwtPayload | string | null => {
+    try {
+      return jwt.verify(token, secretKey) as JwtPayload;
+    } catch (error) {
+      console.error("Invalid token", error);
+      return null;
+    }
+  },
+};
+export default jsonWebToken;
+
+export async function checkForToken(req: Request, res: Response, next: NextFunction){
+  const token = req.cookies.token || req.headers['authorization']?.split(" ")[1];
+
+  console.log("🚀 ~ checkForToken ~ token:", token)
+  
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized: No token provided" });
+  }
+  const isValid = jsonWebToken.verifyToken(token);
+  if (!isValid) {
+    return res.status(401).json({ message: "Unauthorized: Invalid token" });
+  }
+  next();
+}
