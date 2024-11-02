@@ -4,16 +4,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import FormFieldComponent from "./FormFieldComponent";
 import { registerSchema } from "@/utils/getFormSchema";
-import { registerUser } from "@/utils/userActions";
+import { registerUser } from "@/app/api/userActions";
+import { useRouter } from "next/navigation";
 
 const formSchema = registerSchema;
 
 export default function RegisterComponent() {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -25,7 +26,7 @@ export default function RegisterComponent() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    registerUser(values);
+    registerUser(values, router);
   }
   return (
     <Form {...form}>

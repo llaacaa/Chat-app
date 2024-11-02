@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jsonWebToken from "../utils/jsonWebToken";
 import User from "../model/User";
 import { Encrypt } from "../utils/bcryptEncription";
+import { JwtPayload } from "jsonwebtoken";
 
 //Takes params to register a user and returns JWT
 export const registerUser = async (req: Request, res: Response) => {
@@ -118,12 +119,14 @@ export const getUserProfile = async (req: Request, res: Response) => {
   if (!token) {
     return res.status(401).json({ message: "Unauthorized: No token provided" });
   }
-  const isValid = jsonWebToken.verifyToken(token);
-  if (!isValid) {
+  const userData = jsonWebToken.verifyToken(token);
+  if (!userData) {
     return res.status(401).json({ message: "Unauthorized: Invalid token" });
   }
+  const user = await User.findById((userData as JwtPayload).userId);
+
   return res.status(200).json({
-    message: "Finished",
+    user
   });
 };
 
