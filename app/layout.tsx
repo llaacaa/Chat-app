@@ -22,11 +22,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   
+  const loginData = await getLoginData()
 
   return (
     <html lang="en">
       <body>
-          <NavBar />
+          <NavBar isLoggedIn={loginData.isLoggedIn} />
           {children}
       </body>
     </html>

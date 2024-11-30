@@ -42,9 +42,8 @@ export const loginUser = async (data: object, router: AppRouterInstance) => {
         withCredentials: true,
       }
     );
-    console.log("🚀 ~ registerUser ~ response:", response);
     if (response.status == 201) {
-      router.push("/");
+      router.refresh();
     }
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response) {
@@ -69,9 +68,9 @@ export const logoutUser = async (router: AppRouterInstance) => {
         withCredentials: true,
       }
     );
-    console.log("🚀 ~ registerUser ~ response:", response);
-    if (response.status == 201) {
-      router.push("/");
+    console.log("🚀 ~ registerUser ~ response:", response.status);
+    if (response.status == 200) {
+      router.refresh();
     }
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response) {

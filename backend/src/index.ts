@@ -7,6 +7,9 @@ import router from "./routes/users";
 import mongoConnect from "./utils/mongoConnect";
 import cookieParser from 'cookie-parser';
 
+dotenv.config();
+mongoConnect();
+
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
@@ -17,9 +20,6 @@ const io = new Server(server, {
   },
 });
 
-dotenv.config();
-mongoConnect();
-
 //Cors
 const corsOptions = {
   origin: process.env.NEXT_SERVER_URL,
@@ -27,7 +27,6 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, 
 };
-
 
 app.use(cors(corsOptions));
 // To handle JSON data
