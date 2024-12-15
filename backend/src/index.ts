@@ -1,24 +1,22 @@
 import express from "express";
 import { createServer } from "http";
-import { Server } from "socket.io";
+
 import dotenv from "dotenv";
 import cors from "cors";
-import router from "./routes/users";
 import mongoConnect from "./utils/mongoConnect";
 import cookieParser from 'cookie-parser';
+import startSocket from "./controller/socket";
+import userRouter from "./routes/users";
+import friendsRouter from "./routes/friends";
 
 dotenv.config();
 mongoConnect();
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: process.env.NEXT_SERVER_URL,
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
+
+
+startSocket(server);
 
 //Cors
 const corsOptions = {
@@ -37,20 +35,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 
-io.on("connection", (socket) => {
-  console.log("a user connected");
-
-  socket.on("message", (msg) => {
-    console.log("Message received: " + msg);
-    io.emit("message", "Whats up frontend?");
-  });
-
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
-  });
-});
-
-app.use("/user", router);
+app.use("/user", userRouter);
+app.use("/friends", friendsRouter);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

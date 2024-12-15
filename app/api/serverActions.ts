@@ -3,10 +3,10 @@
 import axios, { AxiosResponse } from "axios";
 import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 
-const getProfile = async (token: string) => {
+export const sendServerRequest = async (path:string, token:string) => {
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_USER_AUTH_ROUTE}/getProfile`,
+      `${process.env.NEXT_PUBLIC_USER_AUTH_ROUTE}/${path}`,
       {},
       {
         headers: {
@@ -25,6 +25,12 @@ const getProfile = async (token: string) => {
       return error;
     }
   }
+} 
+
+
+export const getProfile = async (token: string) => {
+  const response = await sendServerRequest("getProfile", token);
+  return response;
 };
 
 export const getLoginInfo = async (cookieStore: ReadonlyRequestCookies) => {
@@ -33,7 +39,6 @@ export const getLoginInfo = async (cookieStore: ReadonlyRequestCookies) => {
     const res = (await getProfile(token?.value)) as AxiosResponse;
     const user = res?.data.user;
     const status = res?.status;
-    console.log("🚀 ~ getLoginInfo ~ status:", status);
     if (status == 200) {
       return { message: undefined, isLoggedIn: true, user };
     } else {

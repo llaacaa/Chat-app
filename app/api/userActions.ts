@@ -1,5 +1,4 @@
-//In app/api to ensure its hidden from the client
-
+import { socketConnect, socketDisconnect } from "@/utils/socketManager";
 import axios from "axios";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
@@ -15,9 +14,9 @@ export const registerUser = async (data: object, router: AppRouterInstance) => {
         withCredentials: true,
       }
     );
-    console.log("🚀 ~ registerUser ~ response:", response);
     if (response.status == 201) {
-      router.push("/");
+      socketConnect();
+      router.refresh();
     }
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response) {
@@ -43,6 +42,7 @@ export const loginUser = async (data: object, router: AppRouterInstance) => {
       }
     );
     if (response.status == 201) {
+      socketConnect();
       router.refresh();
     }
   } catch (error: unknown) {
@@ -68,8 +68,10 @@ export const logoutUser = async (router: AppRouterInstance) => {
         withCredentials: true,
       }
     );
-    console.log("🚀 ~ registerUser ~ response:", response.status);
     if (response.status == 200) {
+      // Logged out 
+      // The socket disconnect should be here
+      socketDisconnect();
       router.refresh();
     }
   } catch (error: unknown) {

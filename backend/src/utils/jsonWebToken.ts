@@ -17,17 +17,17 @@ const jsonWebToken = {
 };
 export default jsonWebToken;
 
-export async function checkForToken(req: Request, res: Response, next: NextFunction){
-  const token = req.cookies.token || req.headers['authorization']?.split(" ")[1];
 
-  console.log("🚀 ~ checkForToken ~ token:", token)
-  
+export async function checkForToken(req: Request, res: Response, next: NextFunction) {
+  const token = req.cookies.token || req.headers["authorization"]?.split(" ")[1];
   if (!token) {
     return res.status(401).json({ message: "Unauthorized: No token provided" });
   }
-  const isValid = jsonWebToken.verifyToken(token);
-  if (!isValid) {
+  const userData = jsonWebToken.verifyToken(token);
+  if (!userData) {
     return res.status(401).json({ message: "Unauthorized: Invalid token" });
-  }
+  }  
   next();
 }
+
+

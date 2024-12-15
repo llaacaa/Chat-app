@@ -7,7 +7,7 @@ export default async function middleware(req: NextRequest) {
   const loginData = await getLoginData();
 
   if (pathname == "/user/auth" && loginData.isLoggedIn) {
-    return NextResponse.redirect(new URL("/home", req.url));
+    return NextResponse.redirect(new URL("/channels", req.url));
   }
 
   if (pathname !== "/user/auth" && !loginData.isLoggedIn) {
@@ -17,5 +17,5 @@ export default async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/home", "/user/auth"],
+  matcher: ["/channels", "/user/auth"],
 };

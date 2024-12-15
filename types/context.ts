@@ -7,4 +7,7 @@ export type LoginInfo = {
 export type User = {
   username: string;
   email: string;
+  friends?: User[] | [],
+  createdAt: Date,
+  lastOnline?: Date,
 };

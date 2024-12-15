@@ -5,6 +5,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   friends: mongoose.Types.ObjectId[];
+  pendingFriendRequests: mongoose.Types.ObjectId[];
   createdAt: Date;
   lastOnline: Date;
   verified: boolean;
@@ -29,6 +30,13 @@ const userSchema: Schema = new Schema({
     minlength: 6,
   },
   friends: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User', 
+      default: [],
+    },
+  ],
+  pendingFriendRequests: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User', 
