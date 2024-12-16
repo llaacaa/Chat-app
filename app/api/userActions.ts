@@ -3,36 +3,21 @@ import axios from "axios";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export const registerUser = async (data: object, router: AppRouterInstance) => {
-  try {
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_USER_AUTH_ROUTE}/register`,
-      data,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      }
-    );
-    if (response.status == 201) {
-      socketConnect();
-      router.refresh();
-    }
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      console.log(error.response.data.message);
-      return error.response;
-    } else {
-      console.log("An unknown error occurred:", error);
-      return error;
-    }
-  }
+  handleUserAction(router, "register", data);
 };
 
 export const loginUser = async (data: object, router: AppRouterInstance) => {
+  handleUserAction(router, "login", data);
+};
+
+export const logoutUser = async (router: AppRouterInstance) => {
+  handleUserAction(router, "logout");
+};
+
+const handleUserAction = async (router: AppRouterInstance, path: string, data?: object) => {
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_USER_AUTH_ROUTE}/login`,
+      `${process.env.NEXT_PUBLIC_USER_AUTH_ROUTE}/${path}`,
       data,
       {
         headers: {
@@ -42,35 +27,11 @@ export const loginUser = async (data: object, router: AppRouterInstance) => {
       }
     );
     if (response.status == 201) {
+      //Login and register
       socketConnect();
       router.refresh();
-    }
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error) && error.response) {
-      console.log(error.response.data.message);
-      return error.response;
-    } else {
-      console.log("An unknown error occurred:", error);
-      return error;
-    }
-  }
-};
-
-export const logoutUser = async (router: AppRouterInstance) => {
-  try {
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_USER_AUTH_ROUTE}/logout`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      }
-    );
-    if (response.status == 200) {
-      // Logged out 
-      // The socket disconnect should be here
+    } else if (response.status == 200) {
+      // Logout
       socketDisconnect();
       router.refresh();
     }
@@ -84,8 +45,6 @@ export const logoutUser = async (router: AppRouterInstance) => {
     }
   }
 };
-
-
 
 
 //Test
