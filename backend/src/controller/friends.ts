@@ -2,13 +2,12 @@ import { Request, Response } from "express";
 import jsonWebToken from "../utils/jsonWebToken";
 import User from "../model/User";
 import { JwtPayload } from "jsonwebtoken";
+import { getSocketIO } from "./socket";
 
 export const sendFriendRequest = async (
   req: Request,
   res: Response
 ) => {
-  // checkForToken(req, res, next);
-
   const token =
     req.cookies.token || req.headers["authorization"]?.split(" ")[1];
   if (!token) {
@@ -25,6 +24,18 @@ export const sendFriendRequest = async (
 
   const userTo = await User.findOne({ username });
   const userFrom = await User.findById(userIDFROM);
+
+  const io = getSocketIO();
+
+  if (io) {
+    io.emit("friend-request", {
+      from: userFrom,
+      to: userTo,
+      message: `${userFrom} has sent you a friend request.`,
+    });
+  }
+
+
   res.send({ userTo, userFrom });
 };
 

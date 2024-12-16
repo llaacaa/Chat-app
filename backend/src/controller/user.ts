@@ -69,7 +69,7 @@ export const loginUser = async (req: Request, res: Response) => {
   const { usernameOrEmail, password } = req.body;
   const searchUser = await User.findOne({
     $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }],
-  });
+  }); 
   if (!searchUser) {
     return res.status(400).json({
       message: "No user found with that email or username.",
@@ -103,7 +103,8 @@ export const loginUser = async (req: Request, res: Response) => {
 
 //Requires to already have JWT
 export const logoutUser = async (req: Request, res: Response) => {
-  const token = req.cookies.token || req.headers["authorization"]?.split(" ")[1];
+  const token =
+    req.cookies.token || req.headers["authorization"]?.split(" ")[1];
   if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
   }
@@ -117,7 +118,8 @@ export const logoutUser = async (req: Request, res: Response) => {
 };
 
 export const getUserProfile = async (req: Request, res: Response) => {
-  const token = req.cookies.token || req.headers["authorization"]?.split(" ")[1];
+  const token =
+    req.cookies.token || req.headers["authorization"]?.split(" ")[1];
   if (!token) {
     return res.status(401).json({ message: "Unauthorized: No token provided" });
   }
@@ -128,7 +130,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
   const user = await User.findById((userData as JwtPayload).userId);
 
   return res.status(200).json({
-    user
+    user,
   });
 };
 

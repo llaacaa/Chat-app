@@ -1,4 +1,3 @@
-import { socketConnect, socketDisconnect } from "@/utils/socketManager";
 import axios from "axios";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
@@ -26,13 +25,7 @@ const handleUserAction = async (router: AppRouterInstance, path: string, data?: 
         withCredentials: true,
       }
     );
-    if (response.status == 201) {
-      //Login and register
-      socketConnect();
-      router.refresh();
-    } else if (response.status == 200) {
-      // Logout
-      socketDisconnect();
+    if (response.status == 201 || response.status == 200) {
       router.refresh();
     }
   } catch (error: unknown) {
