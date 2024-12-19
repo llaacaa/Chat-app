@@ -127,7 +127,10 @@ export const getUserProfile = async (req: Request, res: Response) => {
   if (!userData) {
     return res.status(401).json({ message: "Unauthorized: Invalid token" });
   }
-  const user = await User.findById((userData as JwtPayload).userId);
+  const user = await User.findById((userData as JwtPayload).userId)
+  .populate('friends')
+  .populate('pendingFriendRequests');
+
 
   return res.status(200).json({
     user,

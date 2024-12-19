@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import jsonWebToken from "../utils/jsonWebToken";
-import User from "../model/User";
+import User, { IUser } from "../model/User";
 import { JwtPayload } from "jsonwebtoken";
 import { getSocketIdFromUserId, getSocketIO } from "./socket";
+import { Types } from "mongoose";
 
 export const sendFriendRequest = async (
   req: Request,
@@ -22,15 +23,22 @@ export const sendFriendRequest = async (
   const userIDFROM = (jsonWebToken.verifyToken(req.cookies.token) as JwtPayload)
     .userId;
 
-  const userTo = await User.findOne({ username });
-  const userFrom = await User.findById(userIDFROM);
+  const userTo:IUser | null | undefined = await User.findOne({ username });
+  const userFrom:IUser | null | undefined = await User.findById(userIDFROM);
+
+  
+  if (userTo && userFrom) {
+    userTo?.pendingFriendRequests.push(userFrom?._id as Types.ObjectId); 
+    await userTo!.save(); 
+  }
+  
 
   const io = getSocketIO();
   const userToSocketId = getSocketIdFromUserId(userTo?.id);
   console.log(userToSocketId)
 
   if (io) {
-    io.emit("friend-request", {
+    io.to(userToSocketId).emit("friend-request", {
       from: userFrom,
       to: userTo,
       message: `${userFrom} has sent you a friend request.`,

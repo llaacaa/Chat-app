@@ -5,21 +5,35 @@ import { User } from "@/types/context";
 import { AxiosResponse } from "axios";
 
 async function Page() {
-
   const cookieStore = await cookies();
   const token = cookieStore.get("token");
-  const userData = (await getProfile(token!.value) as AxiosResponse);
-  const { username, email, friends, createdAt, lastOnline } =
-    userData.data.user;
-  const user: User = { username, email, friends, createdAt, lastOnline };
+  async function getUserData() {
+    "use server";
+    const userData = (await getProfile(token!.value)) as AxiosResponse;
+    const {
+      username,
+      email,
+      friends,
+      pendingFriendRequests,
+      createdAt,
+      lastOnline,
+    } = userData.data.user;
+    const user: User = {
+      username,
+      email,
+      friends,
+      pendingFriendRequests,
+      createdAt,
+      lastOnline,
+    };
+    return user;
+  }
 
   return (
     // TOP requests, add friend
     // LEFT filter search, list of friends
     <div>
-      <FriendsNavBar
-        pendingFriendRequests={user.friends}
-      />
+      <FriendsNavBar getUserData={getUserData} />
     </div>
   );
 }

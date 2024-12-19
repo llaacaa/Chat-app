@@ -8,6 +8,7 @@ export type User = {
   username: string;
   email: string;
   friends?: User[] | [],
+  pendingFriendRequests?: User[] | [],
   createdAt: Date,
   lastOnline?: Date,
 };
