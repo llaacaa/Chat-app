@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import jsonWebToken from "../utils/jsonWebToken";
 import User from "../model/User";
 import { JwtPayload } from "jsonwebtoken";
-import { getSocketIO } from "./socket";
+import { getSocketIdFromUserId, getSocketIO } from "./socket";
 
 export const sendFriendRequest = async (
   req: Request,
@@ -26,6 +26,8 @@ export const sendFriendRequest = async (
   const userFrom = await User.findById(userIDFROM);
 
   const io = getSocketIO();
+  const userToSocketId = getSocketIdFromUserId(userTo?.id);
+  console.log(userToSocketId)
 
   if (io) {
     io.emit("friend-request", {
