@@ -1,5 +1,5 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 const secretKey = process.env.JWT_SECRET || "your-secret-key";
 
 const jsonWebToken = {
@@ -17,17 +17,28 @@ const jsonWebToken = {
 };
 export default jsonWebToken;
 
+export interface AuthenticatedRequest extends Request {
+  userData?: unknown;
+}
 
-export async function checkForToken(req: Request, res: Response, next: NextFunction) {
-  const token = req.cookies.token || req.headers["authorization"]?.split(" ")[1];
+export const checkForToken: RequestHandler = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const token =
+    req.cookies.token || req.headers["authorization"]?.split(" ")[1];
   if (!token) {
-    return res.status(401).json({ message: "Unauthorized: No token provided" });
+    res.status(401).json({ message: "Unauthorized: No token provided" });
+    return;
   }
   const userData = jsonWebToken.verifyToken(token);
   if (!userData) {
-    return res.status(401).json({ message: "Unauthorized: Invalid token" });
-  }  
+    res.status(401).json({ message: "Unauthorized: Invalid token" });
+    return;
+  }
+
+  req.userData = userData;
+  
   next();
-}
-
-
+};

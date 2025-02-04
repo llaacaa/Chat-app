@@ -1,11 +1,11 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface IRoom extends Document {
-  name: string; // Name of the chat room
-  members: mongoose.Types.ObjectId[]; // Users in the room
-  messages: mongoose.Types.ObjectId[]; // Messages sent in the room
-  isPrivate: boolean; // Whether the room is private or public
-  createdAt: Date; // When the room was created
+  name: string; 
+  members: mongoose.Types.ObjectId[];
+  messages: mongoose.Types.ObjectId[]; 
+  isPrivate: boolean;
+  createdAt: Date; 
   isGroupChat: boolean;
 }
 
