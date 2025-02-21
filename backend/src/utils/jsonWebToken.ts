@@ -1,4 +1,4 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt, { Jwt, JwtPayload } from "jsonwebtoken";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 const secretKey = process.env.JWT_SECRET || "your-secret-key";
 
@@ -17,8 +17,14 @@ const jsonWebToken = {
 };
 export default jsonWebToken;
 
+interface TokenData extends JwtPayload {
+  userId: String;
+  exp: number;
+  iat: number;
+}
+
 export interface AuthenticatedRequest extends Request {
-  userData?: unknown;
+  userData?: String;
 }
 
 export const checkForToken: RequestHandler = async (
@@ -38,7 +44,7 @@ export const checkForToken: RequestHandler = async (
     return;
   }
 
-  req.userData = userData;
-  
+  req.userData = (userData as TokenData).userId;
+
   next();
 };

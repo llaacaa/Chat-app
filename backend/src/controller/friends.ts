@@ -13,6 +13,7 @@ export const sendFriendRequest = async (
 
   const userTo: IUser | null | undefined = await User.findOne({ username });
   const userFrom: IUser | null | undefined = await User.findById(userIDFROM);
+  console.log("🚀 ~ userFrom:", userFrom)
 
   if (userTo && userFrom) {
     userTo?.pendingFriendRequests.push(userFrom?._id as Types.ObjectId);
