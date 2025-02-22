@@ -1,8 +1,7 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { AuthenticatedRequest } from "../utils/jsonWebToken";
 import User, { IUser } from "../model/User";
 import { getSocketIdFromUserId, getSocketIO } from "./socket";
-import { Types } from "mongoose";
 
 export const sendFriendRequest = async (
   req: AuthenticatedRequest,
@@ -13,16 +12,18 @@ export const sendFriendRequest = async (
 
   const userTo: IUser | null | undefined = await User.findOne({ username });
   const userFrom: IUser | null | undefined = await User.findById(userIDFROM);
-  console.log("🚀 ~ userFrom:", userFrom)
 
   if (userTo && userFrom) {
-    userTo?.pendingFriendRequests.push(userFrom?._id as Types.ObjectId);
-    await userTo!.save();
+    await User.updateOne(
+      { _id: userTo?._id },
+      {
+        $addToSet: { pendingFriendRequests: userFrom?._id },
+      }
+    );
   }
 
   const io = getSocketIO();
   const userToSocketId = getSocketIdFromUserId(userTo?.id);
-  console.log(userToSocketId);
 
   if (io) {
     io.to(userToSocketId).emit("friend-request", {
@@ -32,9 +33,84 @@ export const sendFriendRequest = async (
     });
   }
 
-  res.send({ userTo, userFrom });
+  res.status(200).send({ userTo, userFrom });
 };
 
-export const manageRequest = async (req: Request, res: Response) => {
-  console.log("THROUGH " + req.body.username);
+export const manageRequest = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  const requestFromUsername = req.body.requestFromUsername;
+  const requestToUserID = req.userData;
+
+  const isAccept = req.body.isAccept;
+
+  const userFrom: IUser | null | undefined = await User.findOne({
+    username: requestFromUsername,
+  }).populate("pendingFriendRequests");
+
+  const userTo: IUser | null | undefined = await User.findById(
+    requestToUserID
+  );
+
+  if (isAccept == null) {
+    res.status(400).send({
+      message: "Invalid data",
+    });
+  }
+
+  if (isAccept) {
+    await User.updateOne(
+      { _id: userTo?._id },
+      {
+        $addToSet: { friends: userFrom?._id },
+        $pull: { pendingFriendRequests: userFrom?._id },
+      }
+    );
+
+    await User.updateOne(
+      { _id: userFrom?._id },
+      {
+        $addToSet: { friends: userTo?._id },
+        $pull: { pendingFriendRequests: userTo?._id },
+      }
+    );
+
+    const io = getSocketIO();
+
+    const userFromSocketId = getSocketIdFromUserId(userFrom?.id);
+    const userToSocketId = getSocketIdFromUserId(userTo?.id);
+    
+    if (io) {
+      io.to(userToSocketId).emit("friend-request", {
+        from: userFrom,
+        to: userTo,
+        message: `${userFrom} added as a friend..`,
+      });
+      
+      io.to(userFromSocketId).emit("friend-request", {
+        from: userTo,
+        to: userFrom,
+        message: `${userTo} added as a friend..`,
+      });
+    }
+  } else {
+    await User.updateOne(
+      { _id: userTo?._id },
+      { $pull: { pendingFriendRequests: userFrom?._id } }
+    );
+
+    const io = getSocketIO();
+    const userToSocketId = getSocketIdFromUserId(userTo?.id);
+
+    if (io) {
+      io.to(userToSocketId).emit("friend-request", {
+        from: userFrom,
+        to: userTo,
+        message: `${userFrom} added as a friend..`,
+      });
+    }
+  }
+
+  res.status(200);
 };

@@ -37,7 +37,7 @@ export const getLoginInfo = async (cookieStore: ReadonlyRequestCookies) => {
   const token = cookieStore.get("token");
   if (token) {
     const res = (await getProfile(token?.value)) as AxiosResponse;
-    const user = res?.data.user;
+    const user = res?.data?.user;
     const status = res?.status;
     if (status == 200) {
       return { message: undefined, isLoggedIn: true, user };

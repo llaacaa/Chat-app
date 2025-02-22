@@ -1,9 +1,8 @@
 "use client";
 
 import { User } from "@/types/context";
-import { sendFriendRequest } from "@/utils/friendsManger";
+import { manageFriendRequest, sendFriendRequest } from "@/utils/friendsManger";
 import { socketConnect, socketDisconnect } from "@/utils/socketManager";
-import Image from "next/image";
 import { FormEvent, useEffect, useState } from "react";
 
 function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
@@ -52,34 +51,41 @@ function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
   return (
     <div className="flex">
       <ul>
-        {friendsList?.map((friend, index) => {
-          return <li key={index}>{friend.username}</li>;
+        {friendsList?.map((friend) => {
+          return <li key={friend.username}>{friend.username}</li>;
         })}
       </ul>
       <ul>
-        {friendRequestList?.map((friendReq, index) => {
+        {friendRequestList?.map((friendReq) => {
           return (
-            <li className="flex" key={index}>
+            <li className="flex" key={friendReq.username}>
               <section>{friendReq.username}</section>
-              <button>
-                <Image
-                  src={
-                    "https://cdn-icons-png.flaticon.com/512/4315/4315445.png"
-                  }
-                  width={50}
-                  height={50}
-                  alt="Accept"
-                />
+              <button className="p-2 rounded bg-gray-200 hover:bg-gray-300" onClick={() => manageFriendRequest(true, friendReq.username)}>
+                <svg
+                  className="w-6 h-6"
+                  fill="black"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M12 24A12 12 0 1 1 12 0a12 12 0 0 1 0 24Zm0-22a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm-.08 14.333a0.819 0.819 0 0 1-.22.391 0.892 0.892 0 0 1-.72.259 0.913 0.913 0 0 1-.94-.655l-2.82-2.818a0.9 0.9 0 0 1 1.27-1.271l2.18 2.184 4.46-7.907a1 1 0 0 1 1.38-.385 1.051 1.051 0 0 1 .36 1.417Z"
+                  />
+                </svg>
               </button>
-              <button>
-                <Image
-                  src={
-                    "https://cdn-icons-png.flaticon.com/512/10621/10621089.png"
-                  }
-                  width={50}
-                  height={50}
-                  alt="Accept"
-                />
+
+              <button className="p-2 rounded bg-gray-200 hover:bg-gray-300" onClick={() => manageFriendRequest(false, friendReq.username)}>
+                <svg
+                  className="w-6 h-6"
+                  fill="black"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M12 24A12 12 0 1 1 12 0a12 12 0 0 1 0 24Zm0-22a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm4.706 14.706a0.951 0.951 0 0 1-1.345 0l-3.376-3.376-3.376 3.376a0.949 0.949 0 1 1-1.341-1.342l3.376-3.376-3.376-3.376a0.949 0.949 0 1 1 1.341-1.342l3.376 3.376 3.376-3.376a0.949 0.949 0 1 1 1.342 1.342l-3.376 3.376 3.376 3.376a0.95 0.95 0 0 1 0 1.342Z"
+                  />
+                </svg>
               </button>
             </li>
           );
