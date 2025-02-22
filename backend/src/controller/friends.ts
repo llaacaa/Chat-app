@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthenticatedRequest } from "../utils/jsonWebToken";
 import User, { IUser } from "../model/User";
 import { getSocketIdFromUserId, getSocketIO } from "./socket";
+import Room from "../model/Room";
 
 export const sendFriendRequest = async (
   req: AuthenticatedRequest,
@@ -49,9 +50,7 @@ export const manageRequest = async (
     username: requestFromUsername,
   }).populate("pendingFriendRequests");
 
-  const userTo: IUser | null | undefined = await User.findById(
-    requestToUserID
-  );
+  const userTo: IUser | null | undefined = await User.findById(requestToUserID);
 
   if (isAccept == null) {
     res.status(400).send({
@@ -60,10 +59,18 @@ export const manageRequest = async (
   }
 
   if (isAccept) {
+    const room = new Room({
+      name: userFrom?.username + "-" + userTo?.username,
+      members: [userFrom?._id, userTo?._id],
+      isGroupChat: false,
+    });
+    
+    await room.save();
+
     await User.updateOne(
       { _id: userTo?._id },
       {
-        $addToSet: { friends: userFrom?._id },
+        $addToSet: { friends: userFrom?._id, rooms: room._id },
         $pull: { pendingFriendRequests: userFrom?._id },
       }
     );
@@ -71,7 +78,7 @@ export const manageRequest = async (
     await User.updateOne(
       { _id: userFrom?._id },
       {
-        $addToSet: { friends: userTo?._id },
+        $addToSet: { friends: userTo?._id, rooms: room._id },
         $pull: { pendingFriendRequests: userTo?._id },
       }
     );
@@ -80,14 +87,14 @@ export const manageRequest = async (
 
     const userFromSocketId = getSocketIdFromUserId(userFrom?.id);
     const userToSocketId = getSocketIdFromUserId(userTo?.id);
-    
+
     if (io) {
       io.to(userToSocketId).emit("friend-request", {
         from: userFrom,
         to: userTo,
         message: `${userFrom} added as a friend..`,
       });
-      
+
       io.to(userFromSocketId).emit("friend-request", {
         from: userTo,
         to: userFrom,

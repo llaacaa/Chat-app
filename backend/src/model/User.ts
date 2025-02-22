@@ -6,6 +6,7 @@ export interface IUser extends Document {
   password: string;
   friends: mongoose.Types.ObjectId[];
   pendingFriendRequests: mongoose.Types.ObjectId[];
+  rooms: mongoose.Types.ObjectId[];
   createdAt: Date;
   lastOnline: Date;
   verified: boolean;
@@ -40,6 +41,13 @@ const userSchema: Schema = new Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User', 
+      default: [],
+    },
+  ],
+  rooms: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Room', 
       default: [],
     },
   ],

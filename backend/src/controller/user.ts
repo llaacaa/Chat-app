@@ -104,7 +104,7 @@ export const loginUser = async (req: Request, res: Response) => {
 //Requires to already have JWT
 export const logoutUser = async (req: Request, res: Response) => {
   res.clearCookie("token", { path: "/" });
-  res.status(400).send("Successfully logged out.");
+  res.status(200).send("Successfully logged out.");
 };
 
 export const getUserProfile = async (req: Request, res: Response) => {

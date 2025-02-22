@@ -1,16 +1,16 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface IMessage extends Document {
-  sender: mongoose.Types.ObjectId; // Reference to the User who sent the message
-  content: string; // The actual text of the message
-  room: mongoose.Types.ObjectId; // Reference to the Room where the message was sent
-  timestamp: Date; // When the message was sent
+  sender: mongoose.Types.ObjectId;
+  content: string;
+  room: mongoose.Types.ObjectId;
+  timestamp: Date;
 }
 
 const messageSchema: Schema = new Schema({
   sender: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   content: {
@@ -19,7 +19,7 @@ const messageSchema: Schema = new Schema({
   },
   room: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Room',
+    ref: "Room",
     required: true,
   },
   timestamp: {
@@ -28,6 +28,6 @@ const messageSchema: Schema = new Schema({
   },
 });
 
-const Message = mongoose.model<IMessage>('Message', messageSchema);
+const Message = mongoose.model<IMessage>("Message", messageSchema);
 
 export default Message;

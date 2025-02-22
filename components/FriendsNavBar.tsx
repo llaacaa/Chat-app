@@ -3,6 +3,7 @@
 import { User } from "@/types/context";
 import { manageFriendRequest, sendFriendRequest } from "@/utils/friendsManger";
 import { socketConnect, socketDisconnect } from "@/utils/socketManager";
+import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 
 function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
@@ -12,6 +13,10 @@ function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
   >([]);
 
   const [revalidateTrigger, setRevalidateTrigger] = useState(0);
+
+  const [friendUsername, setFriendUsername] = useState("");
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,8 +46,6 @@ function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
     };
   }, [getUserData, revalidateTrigger]);
 
-  const [friendUsername, setFriendUsername] = useState("");
-
   const handleFormSubmit = async (evt: FormEvent) => {
     evt.preventDefault();
     const response = await sendFriendRequest(friendUsername);
@@ -52,7 +55,15 @@ function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
     <div className="flex">
       <ul>
         {friendsList?.map((friend) => {
-          return <li key={friend.username}>{friend.username}</li>;
+          return (
+            <li
+              key={friend._id}
+              onClick={() => router.push(`/channels/${friend._id}`)}
+              className="cursor-pointer"
+            >
+              {friend.username}
+            </li>
+          );
         })}
       </ul>
       <ul>
@@ -60,7 +71,10 @@ function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
           return (
             <li className="flex" key={friendReq.username}>
               <section>{friendReq.username}</section>
-              <button className="p-2 rounded bg-gray-200 hover:bg-gray-300" onClick={() => manageFriendRequest(true, friendReq.username)}>
+              <button
+                className="p-2 rounded bg-gray-200 hover:bg-gray-300"
+                onClick={() => manageFriendRequest(true, friendReq.username)}
+              >
                 <svg
                   className="w-6 h-6"
                   fill="black"
@@ -74,7 +88,10 @@ function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
                 </svg>
               </button>
 
-              <button className="p-2 rounded bg-gray-200 hover:bg-gray-300" onClick={() => manageFriendRequest(false, friendReq.username)}>
+              <button
+                className="p-2 rounded bg-gray-200 hover:bg-gray-300"
+                onClick={() => manageFriendRequest(false, friendReq.username)}
+              >
                 <svg
                   className="w-6 h-6"
                   fill="black"
@@ -91,7 +108,7 @@ function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
           );
         })}
       </ul>
-      <form onSubmit={handleFormSubmit}>
+      <form onSubmit={handleFormSubmit} className=" right-0 absolute">
         <input
           type="text"
           className=" border"

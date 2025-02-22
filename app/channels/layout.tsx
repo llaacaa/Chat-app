@@ -15,6 +15,7 @@ export default async function WithNavbarLayout({
     "use server";
     const userData = (await getProfile(token!.value)) as AxiosResponse;
     const {
+      _id,
       username,
       email,
       friends,
@@ -23,6 +24,7 @@ export default async function WithNavbarLayout({
       lastOnline,
     } = userData.data.user;
     const user: User = {
+      _id,
       username,
       email,
       friends,

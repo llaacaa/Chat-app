@@ -1,11 +1,10 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface IRoom extends Document {
-  name: string; 
+  name: string;
   members: mongoose.Types.ObjectId[];
-  messages: mongoose.Types.ObjectId[]; 
-  isPrivate: boolean;
-  createdAt: Date; 
+  messages: mongoose.Types.ObjectId[];
+  createdAt: Date;
   isGroupChat: boolean;
 }
 
@@ -20,18 +19,16 @@ const roomSchema: Schema = new Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      default: [],
     },
   ],
   messages: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Message",
+      default: [],
     },
   ],
-  isPrivate: {
-    type: Boolean,
-    default: false,
-  },
   createdAt: {
     type: Date,
     default: Date.now,
