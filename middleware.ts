@@ -17,5 +17,5 @@ export default async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/channels", "/user/auth"],
+  matcher: ["/channels", "/user/auth", "/channels/:channelId*"],
 };
