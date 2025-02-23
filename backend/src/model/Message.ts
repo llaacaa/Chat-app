@@ -5,6 +5,7 @@ export interface IMessage extends Document {
   content: string;
   room: mongoose.Types.ObjectId;
   timestamp: Date;
+  seenBy: mongoose.Types.ObjectId[];
 }
 
 const messageSchema: Schema = new Schema({
@@ -26,6 +27,13 @@ const messageSchema: Schema = new Schema({
     type: Date,
     default: Date.now,
   },
+  seenBy: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: [],
+    },
+  ],
 });
 
 const Message = mongoose.model<IMessage>("Message", messageSchema);
