@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import startSocket from "./controller/socket";
 import userRouter from "./routes/users";
 import friendsRouter from "./routes/friends";
+import roomsRouter from "./routes/rooms";
 
 dotenv.config();
 mongoConnect();
@@ -37,6 +38,7 @@ app.use(cookieParser());
 
 app.use("/user", userRouter);
 app.use("/friends", friendsRouter);
+app.use("/rooms", roomsRouter);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

@@ -1,12 +1,13 @@
 "use client";
 
-import { User } from "@/types/context";
+import { Room, User } from "@/types/context";
 import { sendFriendBackendRequest } from "@/utils/friendsManger";
 import { socketConnect, socketDisconnect } from "@/utils/socketManager";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import AcceptIcon from "./ui/accept";
 import DeclineIcon from "./ui/decline";
+import { sendRoomBackendRequest } from "@/utils/roomsManager";
 
 function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
   const [friendsList, setFriendsList] = useState<User[] | [] | undefined>([]);
@@ -17,6 +18,7 @@ function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
   const [revalidateTrigger, setRevalidateTrigger] = useState(0);
 
   const [friendUsername, setFriendUsername] = useState("");
+  const [rooms, setRooms] = useState<Room[] | [] | undefined>([]);
 
   const router = useRouter();
 
@@ -28,6 +30,8 @@ function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
         const userData = await getUserData();
         setFriendsList(userData.friends);
         setFriendRequestList(userData.pendingFriendRequests);
+        const rooms = await sendRoomBackendRequest("getAllRooms");
+        setRooms(rooms);
       } catch (error) {
         console.error("Failed to fetch user data:", error);
       }
@@ -61,14 +65,14 @@ function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
   return (
     <div className="flex">
       <ul>
-        {friendsList?.map((friend) => {
+        {rooms?.map((room) => {
           return (
             <li
-              key={friend._id}
-              onClick={() => router.push(`/channels/${friend._id}`)}
+              key={room._id}
+              onClick={() => router.push(`/channels/${room._id}`)}
               className="cursor-pointer"
             >
-              {friend.username}
+              {room.name}
             </li>
           );
         })}

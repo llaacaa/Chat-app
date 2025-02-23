@@ -1,7 +1,7 @@
 import axios from "axios";
 import { returnErrorMessage } from "./error";
 
-export async function sendRoomBackendRequest(payload: object, path: string) {
+export async function sendRoomBackendRequest( path: string, payload?: object) {
     try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_ROOMS_ROUTE}/${path}`,
