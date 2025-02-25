@@ -10,22 +10,34 @@ export default function ChatPage() {
   const channelId = params.channelId as string;
 
   const [messages, setMessages] = useState<Message[] | []>([]);
+  const [newMessagem, setNewMessage] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await sendRoomBackendRequest("loadChatMessages", {roomId: channelId});
+      const response = await sendRoomBackendRequest("loadChatMessages", {
+        roomId: channelId,
+      });
       setMessages(response.messages);
-    }
+    };
     fetchData();
   }, []);
 
+
+
   return (
-    <div className="w-full h-1/2 flex items-end justify-center">
-      <ul className="p-4 bg-gray-200 rounded-md shadow">
-        {messages.map(message => {
-         return <li key={message._id}>{message.content}</li>
-        })}
-      </ul>
+    <div>
+      <div className="w-full h-1/2 flex items-end justify-center">
+        <ul className="p-4 bg-gray-200 rounded-md shadow">
+          {messages.map((message) => {
+            return <li key={message._id}>{message.content}</li>;
+          })}
+        </ul>
+      </div>
+      <section className="absolute bottom-10 left-1/2 -translate-x-1/2">
+        <form>
+          <input type="text" className=" border" />
+        </form>
+      </section>
     </div>
   );
 }
