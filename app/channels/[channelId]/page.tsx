@@ -2,15 +2,16 @@
 
 import { Message } from "@/types/context";
 import { sendRoomBackendRequest } from "@/utils/roomsManager";
+import { socketConnect } from "@/utils/socketManager";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 export default function ChatPage() {
   const params = useParams();
   const channelId = params.channelId as string;
 
   const [messages, setMessages] = useState<Message[] | []>([]);
-  const [newMessagem, setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,7 +23,19 @@ export default function ChatPage() {
     fetchData();
   }, []);
 
+  const socket = socketConnect();
 
+  socket.on("receive-message", (data) => {
+    console.log("🚀 ~ socket.on ~ data:", data)
+  })
+
+  async function httpMessageUpload(evt: FormEvent) {
+    evt.preventDefault();
+    // const respone = await sendRoomBackendRequest('', {message: newMessage})
+
+    socket.emit("send-message", newMessage, channelId);
+    setNewMessage("");
+  }
 
   return (
     <div>
@@ -34,8 +47,8 @@ export default function ChatPage() {
         </ul>
       </div>
       <section className="absolute bottom-10 left-1/2 -translate-x-1/2">
-        <form>
-          <input type="text" className=" border" />
+        <form onSubmit={httpMessageUpload}>
+          <input type="text" className="border" value={newMessage} onChange={(evt) => setNewMessage(evt.target.value)}/>
         </form>
       </section>
     </div>

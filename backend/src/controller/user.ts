@@ -48,7 +48,7 @@ export const registerUser = async (req: Request, res: Response) => {
   });
   await user.save();
 
-  const token = jsonWebToken.generateToken(user.id);
+  const token = jsonWebToken.generateToken(user.id, username);
 
   res.cookie("token", token, {
     maxAge: 3600000,
@@ -85,7 +85,7 @@ export const loginUser = async (req: Request, res: Response) => {
     });
   }
 
-  const token = jsonWebToken.generateToken(searchUser.id);
+  const token = jsonWebToken.generateToken(searchUser.id, searchUser.username);
 
   res.cookie("token", token, {
     maxAge: 3600000,

@@ -4,8 +4,8 @@ import { createServer } from "http";
 import dotenv from "dotenv";
 import cors from "cors";
 import mongoConnect from "./utils/mongoConnect";
-import cookieParser from 'cookie-parser';
-import startSocket from "./controller/socket";
+import cookieParser from "cookie-parser";
+import startSocket from "./utils/socket";
 import userRouter from "./routes/users";
 import friendsRouter from "./routes/friends";
 import roomsRouter from "./routes/rooms";
@@ -16,15 +16,14 @@ mongoConnect();
 const app = express();
 const server = createServer(app);
 
-
 startSocket(server);
 
 //Cors
 const corsOptions = {
   origin: process.env.NEXT_SERVER_URL,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true, 
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
 };
 
 app.use(cors(corsOptions));

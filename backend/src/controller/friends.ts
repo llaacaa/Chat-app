@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../utils/jsonWebToken";
 import User, { IUser } from "../model/User";
-import { getSocketIdFromUserId, getSocketIO } from "./socket";
+import { getSocketIdFromUserId, getSocketIO } from "../utils/socket";
 import Room from "../model/Room";
 
 export const sendFriendRequest = async (
@@ -64,7 +64,7 @@ export const manageRequest = async (
       members: [userFrom?._id, userTo?._id],
       isGroupChat: false,
     });
-    
+
     await room.save();
 
     await User.updateOne(

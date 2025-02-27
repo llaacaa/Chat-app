@@ -25,20 +25,6 @@ function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
   const acceptOptions = [true, false];
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userData = await getUserData();
-        setFriendsList(userData.friends);
-        setFriendRequestList(userData.pendingFriendRequests);
-        const rooms = await sendRoomBackendRequest("getAllRooms");
-        setRooms(rooms);
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      }
-    };
-
-    fetchData();
-
     const socket = socketConnect();
 
     socket.on("message", (msg) => {
@@ -48,6 +34,29 @@ function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
     socket.on("friend-request", (msg) => {
       setRevalidateTrigger((prev) => prev + 1);
     });
+
+    socket.on('user-joined', (data) => {
+      console.log(data.message  + " with id: " + data.id);
+    });
+    
+
+    const fetchData = async () => {
+      try {
+        const userData = await getUserData();
+        setFriendsList(userData.friends);
+        setFriendRequestList(userData.pendingFriendRequests);
+        const rooms = await sendRoomBackendRequest("getAllRooms");
+        (rooms as Room[]).forEach(room => {
+          socket.emit('join-room', room._id);
+          console.log(`Joining room with id ${room._id} and name ${room.name}`); 
+        });
+        setRooms(rooms);
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    };
+
+    fetchData();
 
     return () => {
       socketDisconnect();
