@@ -10,7 +10,7 @@ import useFriends from "@/hooks/useFriends";
 function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
   const router = useRouter();
   const {
-    friendRequestList,
+    userInfo,
     rooms,
     acceptOptions,
     handleFormSubmit,
@@ -22,19 +22,21 @@ function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
     <div className="flex">
       <ul>
         {rooms?.map((room) => {
+          const regex = new RegExp(`-?${userInfo?.username}-?`, "g");
+          const roomName = room.isGroupChat ? room.name : room.name.replace(regex, "-").replace(/^-|-$/g, "");
           return (
             <li
               key={room._id}
               onClick={() => router.push(`/channels/${room._id}`)}
               className="cursor-pointer"
             >
-              {room.name}
+              {roomName}
             </li>
           );
         })}
       </ul>
       <ul>
-        {friendRequestList?.map((friendReq) => {
+        {userInfo?.pendingFriendRequests?.map((friendReq) => {
           return (
             <li className="flex" key={friendReq.username}>
               <section>{friendReq.username}</section>

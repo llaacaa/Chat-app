@@ -6,15 +6,12 @@ import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 
 export default function useFriends(getUserData: () => Promise<User>) {
-  const [friendsList, setFriendsList] = useState<User[] | [] | undefined>([]);
-  const [friendRequestList, setFriendRequestList] = useState<
-    User[] | [] | undefined
-  >([]);
-
   const [revalidateTrigger, setRevalidateTrigger] = useState(0);
 
   const [friendUsername, setFriendUsername] = useState("");
   const [rooms, setRooms] = useState<Room[] | [] | undefined>([]);
+
+  const [userInfo, setUserInfo] = useState<User | null>(null);
 
   const acceptOptions = [true, false];
 
@@ -32,8 +29,9 @@ export default function useFriends(getUserData: () => Promise<User>) {
     const fetchData = async () => {
       try {
         const userData = await getUserData();
-        setFriendsList(userData.friends);
-        setFriendRequestList(userData.pendingFriendRequests);
+
+        setUserInfo(userData);
+
         const rooms = await sendRoomBackendRequest("getAllRooms");
         (rooms as Room[]).forEach((room) => {
           socket.emit("join-room", room._id);
@@ -63,7 +61,7 @@ export default function useFriends(getUserData: () => Promise<User>) {
   };
 
   return {
-    friendRequestList,
+    userInfo,
     rooms,
     acceptOptions,
     handleFormSubmit,
