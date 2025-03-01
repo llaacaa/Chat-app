@@ -27,7 +27,7 @@ export type Message = {
   _id: string;
   sender: User;
   content: string;
-  room: Room;
+  room: string;
   timestamp: Date;
   seenBy: User[];
 };

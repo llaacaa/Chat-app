@@ -2,6 +2,8 @@ import { Server } from "socket.io";
 import http from "http";
 import jsonWebToken from "./jsonWebToken";
 import { JwtPayload } from "jsonwebtoken";
+import Message from "../model/Message";
+import Room from "../model/Room";
 
 type TServerInstance = http.Server;
 
@@ -35,7 +37,10 @@ function startSocket(server: TServerInstance): Server {
         const userData = jsonWebToken.verifyToken(token) as JwtPayload; // Verify the token
         if (userData) {
           connectedUsers[userData.userId] = socket.id; // Map userId to socket.id
-          socket.data.userData = {userId: userData.userId, username: userData.username}
+          socket.data.userData = {
+            userId: userData.userId,
+            username: userData.username,
+          };
           console.log(
             `User ${userData.userId}(${userData.username}) connected with socket ID ${socket.id}`
           );
@@ -50,12 +55,29 @@ function startSocket(server: TServerInstance): Server {
         return;
       }
 
-      socket.on("send-message", (message, roomId) => {
-        console.log(`Message: ${message}, roomId: ${roomId}, sender: ${socket.data.userData.username}`)
-        socket.to(roomId).emit("receive-message", {
-          sender: socket.data.userData.username,
-          message: message,
+      socket.on("send-message", async (message, roomId) => {
+        console.log(
+          `Message: ${message}, roomId: ${roomId}, sender: ${socket.data.userData.username}`
+        );
+
+        const messageData = new Message({
+          sender: socket.data.userData.userId,
+          content: message,
+          room: roomId,
+          timestamp: Date.now(),
         });
+
+        io!.to(roomId).emit("receive-message", messageData);
+
+        const messageDB = new Message(messageData);
+        try {
+          await messageDB.save();
+          await Room.findByIdAndUpdate(roomId, {
+            $push: { messages: messageDB._id },
+          });
+        } catch (error) {
+          console.error("Error saving message or updating room:", error);
+        }
       });
 
       socket.on("join-room", (roomId) => {

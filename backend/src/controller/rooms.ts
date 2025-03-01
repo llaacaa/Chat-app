@@ -18,18 +18,22 @@ export const loadChatMessages = async (
   res: Response
 ) => {
   const loggedInUser = req.userData;
-
-  const roomId = req.body.roomId;
+  const { roomId } = req.body;
 
   if (!roomId) {
-    res.status(401).json({ message: "No roomId provided." });
+    return res.status(400).json({ message: "No roomId provided." });
   }
 
-  const room = await Room.findById(roomId, { members: loggedInUser })
+  const room = await Room.findOne({
+    _id: roomId,
+    members: loggedInUser,
+  }).populate("messages");
 
   if (!room) {
-    res.status(404).json({ message: "Room not found or not member of it." });
+    return res
+      .status(404)
+      .json({ message: "Room not found or not a member of it." });
   }
 
-  res.status(200).json({ messages: room?.messages || [] });
+  return res.status(200).json({ messages: room.messages || [] });
 };
