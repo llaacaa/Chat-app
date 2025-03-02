@@ -59,26 +59,29 @@ function startSocket(server: TServerInstance): Server {
         console.log(
           `Message: ${message}, roomId: ${roomId}, sender: ${socket.data.userData.username}`
         );
-
+      
         const messageData = new Message({
           sender: socket.data.userData.userId,
           content: message,
           room: roomId,
           timestamp: Date.now(),
         });
-
-        io!.to(roomId).emit("receive-message", messageData);
-
-        const messageDB = new Message(messageData);
+      
         try {
-          await messageDB.save();
+          const savedMessage = await messageData.save();
+      
+          const populatedMessage = await savedMessage.populate("sender");
+      
+          io!.to(roomId).emit("receive-message", populatedMessage);
+      
           await Room.findByIdAndUpdate(roomId, {
-            $push: { messages: messageDB._id },
+            $push: { messages: savedMessage._id },
           });
         } catch (error) {
           console.error("Error saving message or updating room:", error);
         }
       });
+      
 
       socket.on("join-room", (roomId) => {
         socket.join(roomId);

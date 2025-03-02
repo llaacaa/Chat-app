@@ -27,7 +27,14 @@ export const loadChatMessages = async (
   const room = await Room.findOne({
     _id: roomId,
     members: loggedInUser,
-  }).populate("messages");
+  })
+    .populate({
+      path: "messages",
+      populate: {
+        path: "sender", 
+        select: "username email", 
+      },
+    });
 
   if (!room) {
     return res
@@ -37,3 +44,4 @@ export const loadChatMessages = async (
 
   return res.status(200).json({ messages: room.messages || [] });
 };
+
