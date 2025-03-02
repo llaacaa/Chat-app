@@ -1,29 +1,32 @@
 "use client";
 
-import { User } from "@/types/context";
 import { sendFriendBackendRequest } from "@/utils/friendsManger";
 import { useRouter } from "next/navigation";
 import AcceptIcon from "./ui/accept";
 import DeclineIcon from "./ui/decline";
 import useFriends from "@/hooks/useFriends";
+import { useUserState } from "@/context/UserInfoContext";
 
-function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
+function FriendsNavBar() {
+  const { userState, setUserState } = useUserState();
+
   const router = useRouter();
   const {
-    userInfo,
     rooms,
     acceptOptions,
     handleFormSubmit,
     friendUsername,
     setFriendUsername,
-  } = useFriends(getUserData);
+  } = useFriends(userState);
 
   return (
     <div className="flex">
       <ul>
         {rooms?.map((room) => {
-          const regex = new RegExp(`-?${userInfo?.username}-?`, "g");
-          const roomName = room.isGroupChat ? room.name : room.name.replace(regex, "-").replace(/^-|-$/g, "");
+          const regex = new RegExp(`-?${userState?.username}-?`, "g");
+          const roomName = room.isGroupChat
+            ? room.name
+            : room.name.replace(regex, "-").replace(/^-|-$/g, "");
           return (
             <li
               key={room._id}
@@ -36,7 +39,7 @@ function FriendsNavBar({ getUserData }: { getUserData: () => Promise<User> }) {
         })}
       </ul>
       <ul>
-        {userInfo?.pendingFriendRequests?.map((friendReq) => {
+        {userState?.pendingFriendRequests?.map((friendReq) => {
           return (
             <li className="flex" key={friendReq.username}>
               <section>{friendReq.username}</section>

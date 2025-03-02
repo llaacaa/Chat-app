@@ -2,16 +2,14 @@ import { Room, User } from "@/types/context";
 import { sendFriendBackendRequest } from "@/utils/friendsManger";
 import { sendRoomBackendRequest } from "@/utils/roomsManager";
 import { getSocket, socketDisconnect } from "@/utils/socketManager";
-import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 
-export default function useFriends(getUserData: () => Promise<User>) {
+export default function useFriends(userData: User | null) {
   const [revalidateTrigger, setRevalidateTrigger] = useState(0);
 
   const [friendUsername, setFriendUsername] = useState("");
   const [rooms, setRooms] = useState<Room[] | [] | undefined>([]);
 
-  const [userInfo, setUserInfo] = useState<User | null>(null);
 
   const acceptOptions = [true, false];
 
@@ -28,9 +26,6 @@ export default function useFriends(getUserData: () => Promise<User>) {
 
     const fetchData = async () => {
       try {
-        const userData = await getUserData();
-
-        setUserInfo(userData);
 
         const rooms = await sendRoomBackendRequest("getAllRooms");
         (rooms as Room[]).forEach((room) => {
@@ -50,7 +45,7 @@ export default function useFriends(getUserData: () => Promise<User>) {
       socket.off("friend-request");
       socket.off("user-joined");
     };
-  }, [getUserData, revalidateTrigger]);
+  }, [userData, revalidateTrigger]);
 
   const handleFormSubmit = async (evt: FormEvent) => {
     evt.preventDefault();
@@ -61,7 +56,6 @@ export default function useFriends(getUserData: () => Promise<User>) {
   };
 
   return {
-    userInfo,
     rooms,
     acceptOptions,
     handleFormSubmit,

@@ -1,17 +1,17 @@
 "use client";
 
+import { useUserState } from "@/context/UserInfoContext";
 import useMessages from "@/hooks/useMessages";
-import { Message } from "@/types/context";
-import { sendRoomBackendRequest } from "@/utils/roomsManager";
-import { getSocket } from "@/utils/socketManager";
 import { useParams } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
 
 export default function ChatPage() {
   const params = useParams();
   const channelId = params.channelId as string;
 
   const { messages, newMessage, setNewMessage, sendMessage } = useMessages(channelId);
+
+  const {userState, setUserState} = useUserState();
+  console.log("🚀 ~ ChatPage ~ userState:", userState)
 
   return (
     <div>
