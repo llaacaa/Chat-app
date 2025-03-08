@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { User } from "@/types/context";
 import { CheckboxWithText } from "./FriendAddToGroupChat";
+import { toast } from "sonner";
 
 interface CreateGroupDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateGroup: (groupName: string) => void;
+  onCreateGroup: (users: User[], groupName: string) => void;
   friends: User[] | [] | undefined;
   membersToFilter: string[]
 }
@@ -21,7 +22,11 @@ const CreateGroupDialog: React.FC<CreateGroupDialogProps> = ({
   const [groupName, setGroupName] = useState("");
 
   const handleCreateGroup = () => {
-    onCreateGroup(groupName);
+    if (selectedFriends.length === 0) {
+      toast.error("Please select at least one friend to add to the group.");
+      return;
+    }
+    onCreateGroup(selectedFriends, groupName);
     onClose();
   };
 

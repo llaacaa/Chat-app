@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthenticatedRequest } from "../utils/jsonWebToken";
 import Room from "../model/Room";
 import Message from "../model/Message";
+import User from "../model/User";
 
 export const getAllRooms = async (req: AuthenticatedRequest, res: Response) => {
   const loggedInUser = req.userData;
@@ -47,5 +48,36 @@ export const getRoomInfo = async (
   }
 
   return res.status(200).json({ messages: room.messages || [] , members: room.members.filter((member) => member._id.toString() != loggedInUser) });
+};
+
+export const createRoom = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  const loggedInUser = req.userData;
+  const { usersId } = req.body;
+
+  if (!loggedInUser) {
+    return res.status(401).json({ message: "Unauthorized: No token provided" });
+  }
+
+  if (!usersId) {
+    return res.status(400).json({ message: "No usersId provided." });
+  }
+
+  const allUserIds = [...usersId, loggedInUser];
+  
+  const users = await User.find({ _id: { $in: allUserIds } });
+  const usernames = users.map((user) => user.username);
+
+  const roomName = usernames.join(', ');
+
+  const room = await Room.create({
+    members: [...usersId, loggedInUser],
+    name: roomName,
+    isGroupChat: true,
+  });
+
+  return res.status(200).json({message: "Room created successfully.", messages: room.messages || [] , members: room.members.filter((member) => member._id.toString() != loggedInUser) });
 };
 
