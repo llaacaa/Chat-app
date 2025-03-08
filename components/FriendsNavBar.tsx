@@ -7,12 +7,10 @@ import DeclineIcon from "./ui/decline";
 import useFriends from "@/hooks/useFriends";
 import { useUserState } from "@/context/UserInfoContext";
 import {useState} from "react";
-import CreateGroupDialog from "@/components/CreateGroupDialog";
 
 function FriendsNavBar() {
-  const { userState, setUserState } = useUserState();
+  const { userState } = useUserState();
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const router = useRouter();
   const {
@@ -23,18 +21,11 @@ function FriendsNavBar() {
     setFriendUsername,
   } = useFriends(userState);
 
-    const handleCreateGroup = (groupName: string) => {
-        console.log(`Group created: ${groupName}`);
-    };
+   
 
   return (
     <div className="">
-        <CreateGroupDialog
-            isOpen={isDialogOpen}
-            onClose={() => setIsDialogOpen(false)}
-            onCreateGroup={handleCreateGroup}
-            friends={userState?.friends}
-        />
+        
       <ul>
         {rooms?.map((room) => {
           const regex = new RegExp(`-?${userState?.username}-?`, "g");
@@ -52,7 +43,6 @@ function FriendsNavBar() {
           );
         })}
       </ul>
-      <button onClick={() => setIsDialogOpen(true)}>Create Group</button>
       <ul>
         {userState?.pendingFriendRequests?.map((friendReq) => {
           return (

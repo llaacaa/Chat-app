@@ -1,12 +1,12 @@
 import express from "express";
 import asyncHandler from "../utils/catchAsync";
 import { checkForToken } from "../utils/jsonWebToken";
-import { getAllRooms, loadChatMessages } from "../controller/rooms";
+import { getAllRooms, getRoomInfo } from "../controller/rooms";
 
 const roomsRouter = express.Router();
 
 roomsRouter.post("/getAllRooms", checkForToken, asyncHandler(getAllRooms));
-roomsRouter.post("/loadChatMessages", checkForToken, asyncHandler(loadChatMessages));
+roomsRouter.post("/getRoomInfo", checkForToken, asyncHandler(getRoomInfo));
 
 
 export default roomsRouter;

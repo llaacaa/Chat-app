@@ -13,13 +13,17 @@ export const getAllRooms = async (req: AuthenticatedRequest, res: Response) => {
   res.status(200).json(rooms);
 };
 
-export const loadChatMessages = async (
+export const getRoomInfo = async (
   req: AuthenticatedRequest,
   res: Response
 ) => {
   const loggedInUser = req.userData;
   const { roomId } = req.body;
 
+  if (!loggedInUser) {
+    return res.status(401).json({ message: "Unauthorized: No token provided" });
+  }
+  
   if (!roomId) {
     return res.status(400).json({ message: "No roomId provided." });
   }
@@ -42,6 +46,6 @@ export const loadChatMessages = async (
       .json({ message: "Room not found or not a member of it." });
   }
 
-  return res.status(200).json({ messages: room.messages || [] });
+  return res.status(200).json({ messages: room.messages || [] , members: room.members.filter((member) => member._id.toString() != loggedInUser) });
 };
 

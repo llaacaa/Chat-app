@@ -1,21 +1,40 @@
 "use client";
 
 import MessageComponent from "@/components/chat/MessageComponent";
+import CreateGroupDialog from "@/components/CreateGroupDialog";
+import { Button } from "@/components/ui/button";
 import { useUserState } from "@/context/UserInfoContext";
 import useMessages from "@/hooks/useMessages";
 import { useParams } from "next/navigation";
+import { useState } from "react";
 
 export default function ChatPage() {
   const params = useParams();
   const channelId = params.channelId as string;
 
-  const { messages, newMessage, setNewMessage, sendMessage } =
+  const { userState } = useUserState();
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const {members, messages, newMessage, setNewMessage, sendMessage } =
     useMessages(channelId);
+
+    const handleCreateGroup = (groupName: string) => {
+      console.log(`Group created: ${groupName}`);
+  };
 
 
   return (
     <div>
+      <Button onClick={() => setIsDialogOpen(true)}>Add to Group Chat</Button>
       <div className="w-full h-1/2 flex items-end justify-center">
+      <CreateGroupDialog
+            isOpen={isDialogOpen}
+            onClose={() => setIsDialogOpen(false)}
+            onCreateGroup={handleCreateGroup}
+            friends={userState?.friends}
+            membersToFilter={members}
+        />
         <ul className="p-4 w-full bg-gray-200 rounded-md shadow">
           {messages.map((message, index) => {
             const previousMessage = index > 0 ? messages[index - 1] : null;

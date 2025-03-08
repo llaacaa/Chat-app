@@ -11,7 +11,7 @@ function MessageComponent({
   shouldDisplayProfilePicture: boolean;
 }) {
 
-  const { userState, setUserState } = useUserState();
+  const { userState } = useUserState();
 
 //   const additionalClasses = shouldDisplayProfilePicture ? ""
 const classes = userState?.username == message.sender.username ? "justify-self-end" : "justify-self-start"

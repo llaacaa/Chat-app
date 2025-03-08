@@ -1,18 +1,21 @@
-import { Message } from "@/types/context";
+import { Message, User } from "@/types/context";
 import { sendRoomBackendRequest } from "@/utils/roomsManager";
 import { getSocket } from "@/utils/socketManager";
+import { set } from "mongoose";
 import { FormEvent, useEffect, useState } from "react";
 
 export default function useMessages(channelId: string) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [members, setMembers] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await sendRoomBackendRequest("loadChatMessages", {
+      const response = await sendRoomBackendRequest("getRoomInfo", {
         roomId: channelId,
       });
       setMessages(response.messages);
+      setMembers(response.members);
     };
     fetchData();
   }, [channelId]);
@@ -41,5 +44,5 @@ export default function useMessages(channelId: string) {
     setNewMessage("");
   }
 
-  return { messages, newMessage, setNewMessage, sendMessage };
+  return { members, messages, newMessage, setNewMessage, sendMessage };
 }
